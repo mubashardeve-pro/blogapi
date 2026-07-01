@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+app.set("trust proxy", 1);
 const db = require('./db/models');
 const { categories } = require('./db/models');
 const globalErrorHandler = require('./utils/errorController');
