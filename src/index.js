@@ -23,8 +23,9 @@ app.get("/",(req,res)=>{
 app.use(globalErrorHandler)
 
 const PORT = process.env.PORT || 4600;
+const isVercel = Boolean(process.env.VERCEL);
 
-async function startServer() {
+async function initializeApp() {
   const requiredEnv = ["JWT_SECRET", "DB_NAME", "DB_USER", "DB_HOST", "AWS_BUCKET_NAME", "AWS_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"];
   const missing = requiredEnv.filter((key) => !process.env[key]);
   if (missing.length) {
@@ -38,15 +39,30 @@ async function startServer() {
     where: { slug: "uncategorized" },
     defaults: { name: "Uncategorized", slug: "uncategorized" },
   });
-
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
 }
 
-startServer().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+const initPromise = initializeApp();
+
+if (isVercel) {
+  app.use(async (req, res, next) => {
+    try {
+      await initPromise;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+} else {
+  initPromise
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    });
+}
 
 module.exports = app;
