@@ -18,7 +18,7 @@ const signup = async (req, res) => {
     const auther = await authers.create({ name, email, password: hash })
     // console.log(auther)
 
-    const token = jwt.sign({ id: auther.id }, process.env.JWT_SECRET)
+    const token = jwt.sign({ id: auther.id }, process.env.JWT_SECRET, { expiresIn: "1d" })
     res.cookie("token", token, cookieOptions)
 
     const { password: _password, ...safeAuthor } = auther.toJSON()
