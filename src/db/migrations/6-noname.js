@@ -5,45 +5,53 @@ var Sequelize = require('sequelize');
 /**
  * Actions summary:
  *
- * addColumn "image_url" to table "blogs"
+ * changeColumn "image_url" on table "blogs"
  *
  **/
 
 var info = {
     "revision": 6,
     "name": "noname",
-    "created": "2026-06-29T00:00:00.000Z",
+    "created": "2026-07-01T12:47:06.376Z",
     "comment": ""
 };
 
 var migrationCommands = [{
-    fn: "addColumn",
+    fn: "changeColumn",
     params: [
         "blogs",
         "image_url",
         {
             "type": Sequelize.STRING,
             "field": "image_url",
-            "allowNull": false,
-            "defaultValue": "https://placehold.co/1200x630/png?text=Blog+Image"
+            "validate": {
+                "notEmpty": true,
+                "notNull": true
+            },
+            "allowNull": false
         }
     ]
 }];
 
 module.exports = {
     pos: 0,
-    up: async function(queryInterface, Sequelize)
+    up: function(queryInterface, Sequelize)
     {
-        const blogsTable = await queryInterface.describeTable('blogs');
-
-        if (!blogsTable.image_url) {
-            await queryInterface.addColumn('blogs', 'image_url', {
-                type: Sequelize.STRING,
-                field: 'image_url',
-                allowNull: false,
-                defaultValue: 'https://placehold.co/1200x630/png?text=Blog+Image',
-            });
-        }
+        var index = this.pos;
+        return new Promise(function(resolve, reject) {
+            function next() {
+                if (index < migrationCommands.length)
+                {
+                    let command = migrationCommands[index];
+                    console.log("[#"+index+"] execute: " + command.fn);
+                    index++;
+                    queryInterface[command.fn].apply(queryInterface, command.params).then(next, reject);
+                }
+                else
+                    resolve();
+            }
+            next();
+        });
     },
     info: info
 };

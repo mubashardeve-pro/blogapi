@@ -102,6 +102,10 @@
                 },
                 "image_url": {
                     "allowNull": false,
+                    "validate": {
+                        "notEmpty": true,
+                        "notNull": true
+                    },
                     "field": "image_url",
                     "seqType": "Sequelize.STRING"
                 },
@@ -183,5 +187,5 @@
             "indexes": []
         }
     },
-    "revision": 5
+    "revision": 6
 }

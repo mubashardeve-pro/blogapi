@@ -92,6 +92,19 @@
                     "field": "description",
                     "seqType": "Sequelize.TEXT"
                 },
+                "is_published": {
+                    "allowNull": false,
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_published",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "image_url": {
+                    "allowNull": false,
+                    "field": "image_url",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -170,5 +183,5 @@
             "indexes": []
         }
     },
-    "revision": 4
+    "revision": 5
 }
