@@ -8,7 +8,7 @@ const cookieParser = require("cookie-parser");
 const authMiddleware = require('./middlewares/authMiddleware');
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: process.env.CLIENT_URL || "http://localhost:3000" || "https://frontend-chi-eight-63.vercel.app/",
   credentials: true,
 }));
 app.use(express.json({ limit: "15mb" }));
@@ -16,7 +16,7 @@ app.use(cookieParser());
 
 app.use("/api/v1", authMiddleware, require("./routes"));
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   res.send("Home Page")
 })
 
