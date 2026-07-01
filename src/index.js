@@ -8,20 +8,41 @@ const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authMiddleware = require('./middlewares/authMiddleware');
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://frontend-chi-eight-63.vercel.app",
+];
+
+if (process.env.CLIENT_URL) {
+  const clientUrl = process.env.CLIENT_URL.replace(/\/$/, "");
+  if (!allowedOrigins.includes(clientUrl)) {
+    allowedOrigins.push(clientUrl);
+  }
+}
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3000" || "https://frontend-chi-eight-63.vercel.app/",
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+    const normalized = origin.replace(/\/$/, "");
+    const isAllowed = allowedOrigins.some(
+      (allowed) => allowed.replace(/\/$/, "") === normalized
+    );
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS not allowed for origin: ${origin}`));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: "15mb" }));
 app.use(cookieParser());
 
-app.use("/api/v1", authMiddleware, require("./routes"));
-
 app.get("/", (req, res) => {
   res.send("Home Page")
 })
-
-app.use(globalErrorHandler)
 
 const PORT = process.env.PORT || 4600;
 const isVercel = Boolean(process.env.VERCEL);
@@ -53,7 +74,13 @@ if (isVercel) {
       next(error);
     }
   });
-} else {
+}
+
+app.use("/api/v1", authMiddleware, require("./routes"));
+
+app.use(globalErrorHandler);
+
+if (!isVercel) {
   initPromise
     .then(() => {
       app.listen(PORT, () => {
