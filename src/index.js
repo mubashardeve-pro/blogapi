@@ -7,15 +7,17 @@ const globalErrorHandler = require('./utils/errorController');
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authMiddleware = require('./middlewares/authMiddleware');
-
+var clientUrl = "https://mubashar-blogs.vercel.app"
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://frontend-chi-eight-63.vercel.app",
+  clientUrl,
 ];
 
-if (process.env.CLIENT_URL) {
-  const clientUrl = process.env.CLIENT_URL.replace(/\/$/, "");
+if (clientUrl) {
+  clientUrl = clientUrl.replace(/\/$/, "");
   if (!allowedOrigins.includes(clientUrl)) {
+    allowedOrigins.push(clientUrl);
+  } else {
     allowedOrigins.push(clientUrl);
   }
 }

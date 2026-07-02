@@ -41,7 +41,7 @@ const generateRandomSlug = () => {
 
 const blogIncludes = [
   { model: authers, as: 'author', attributes: ['name'] },
-  { model: categories, as: 'category', attributes: ['name', 'slug'] },
+  { model: categories, as: 'category', attributes: ['id', 'name', 'slug'] },
 ];
 
 const getAllBlogs = async (req, res) => {
@@ -122,9 +122,8 @@ const uploadImage = async (req, res) => {
 const addBlog = async (req, res) => {
   const { title, description, category_id, image_url } = req.body;
 
-  const [uncategorizedCategory] = await categories.findOrCreate({
+  const uncategorizedCategory = await categories.findOne({
     where: { slug: "uncategorized" },
-    defaults: { name: "Uncategorized", slug: "uncategorized" },
   });
 
   const blogTitle = title?.trim() || "Untitled";
@@ -136,12 +135,12 @@ const addBlog = async (req, res) => {
   );
 
   const blog = await blogs.create({
-    title: blogTitle,
+    title: title || "Unlisted",
     description: description || "No description",
     image_url: image_url || DEFAULT_BLOG_IMAGE_URL,
     author_id: req.author.id,
     category_id: category_id || uncategorizedCategory.id,
-    slug: blogSlug,
+    slug: toSlug(title) || toSlug(title + Math.random(2)),
   });
 
   const createdBlog = await blogs.findByPk(blog.id, { include: blogIncludes });
