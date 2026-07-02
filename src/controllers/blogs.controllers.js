@@ -120,7 +120,7 @@ const uploadImage = async (req, res) => {
 };
 
 const addBlog = async (req, res) => {
-  const { title, description, category_id, image_url } = req.body;
+  const { title , description, category_id, image_url } = req.body;
 
   const uncategorizedCategory = await categories.findOne({
     where: { slug: "uncategorized" },
