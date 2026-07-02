@@ -7,7 +7,7 @@ const globalErrorHandler = require('./utils/errorController');
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const authMiddleware = require('./middlewares/authMiddleware');
-var clientUrl = "https://mubashar-blogs.vercel.app"
+var clientUrl = "https://frontend-chi-eight-63.vercel.app"
 const allowedOrigins = [
   "http://localhost:3000",
   clientUrl,
@@ -39,6 +39,9 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+
+
 app.use(express.json({ limit: "15mb" }));
 app.use(cookieParser());
 
